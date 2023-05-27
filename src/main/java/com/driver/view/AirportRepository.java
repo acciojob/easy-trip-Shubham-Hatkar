@@ -6,9 +6,7 @@ import com.driver.model.Flight;
 import com.driver.model.Passenger;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class AirportRepository
@@ -33,14 +31,20 @@ public class AirportRepository
         airportAndNoOfTerminals.add(new Pair(airport.getAirportName(),airport.getNoOfTerminals()));
     }
 
-    public void addPassenger(Passenger passenger)
+    public String addPassenger(Passenger passenger)
     {
-        passengerDB.put(passenger.getPassengerId(), passenger);
+        if(passengerDB.containsKey(passenger.getPassengerId()) == false)
+        {
+            passengerDB.put(passenger.getPassengerId(), passenger);
+            return "SUCCESS";
+        }
+        return "";
     }
 
-    public void addFlight(Flight flight)
+    public String addFlight(Flight flight)
     {
         flightDB.put(flight.getFlightId(), flight);
+        return "SUCCESS";
     }
 
     public List<Pair> getAllPairsOfAirportAndNoOfTerminals()
@@ -52,7 +56,7 @@ public class AirportRepository
     {
         if(flightDB.containsKey(flightId))
             return flightDB.get(flightId).getFromCity().toString();
-        return null;
+        return "";
     }
 
     public String bookATicket(Integer flightId, Integer passengerId)
@@ -112,5 +116,54 @@ public class AirportRepository
             }
         }
         return "FAILURE";
+    }
+
+    public int getNumberOfPeopleOn(Date date, String airportName)
+    {
+        Airport airport = airportDB.get(airportName);
+        if(Objects.isNull(airport)) return 0;
+
+        City city = airport.getCity();
+        int cnt = 0;
+        for(int key : flightDB.keySet())
+        {
+            Flight flight = flightDB.get(key);
+            if(flight.getFlightDate().equals(date))
+            {
+                if(flight.getFromCity().equals(city) || flight.getToCity().equals(city))
+                {
+                    cnt += flightAndPassengersDB.get(flight.getFlightId()).size();
+                }
+            }
+        }
+        return cnt;
+    }
+
+    public int calculateFlightFare(Integer flightId)
+    {
+        return flightAndPassengersDB.get(flightId).size() * 50 + 3000;
+    }
+
+    public int countOfBookingsDoneByPassengerAllCombined(Integer passengerId)
+    {
+        int cnt = 0;
+        for(int key : flightAndPassengersDB.keySet())
+        {
+            List<Passenger> passengerList = flightAndPassengersDB.get(key);
+            for(Passenger passenger : passengerList)
+            {
+                if(passenger.getPassengerId() == passengerId) cnt++;
+            }
+        }
+        return cnt;
+    }
+
+    public int calculateRevenueOfAFlight(Integer flightId)
+    {
+        int ticketsBookedTillNow = flightAndPassengersDB.get(flightId).size();
+        int amountWith3000Rs = ticketsBookedTillNow * 3000;
+        int ExtraMoneryEnjoy = (ticketsBookedTillNow * (ticketsBookedTillNow - 1) * 25);
+        int totalKamayaFlightWaloNe = amountWith3000Rs + ExtraMoneryEnjoy;
+        return totalKamayaFlightWaloNe;
     }
 }

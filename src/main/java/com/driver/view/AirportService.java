@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -22,14 +23,14 @@ public class AirportService
         airportRepository.addAirport(airport);
     }
 
-    public void addPassenger(Passenger passenger)
+    public String addPassenger(Passenger passenger)
     {
-        airportRepository.addPassenger(passenger);
+        return airportRepository.addPassenger(passenger);
     }
 
-    public void addFlight(Flight flight)
+    public String addFlight(Flight flight)
     {
-        airportRepository.addFlight(flight);
+        return airportRepository.addFlight(flight);
     }
 
     public String getLargestAirportName()
@@ -73,5 +74,24 @@ public class AirportService
     public String cancelATicket(Integer flightId, Integer passengerId)
     {
         return airportRepository.cancelATicket(flightId,passengerId);
+    }
+
+    public int getNumberOfPeopleOn(Date date, String airportName) {
+        return airportRepository.getNumberOfPeopleOn(date,airportName);
+    }
+
+    public int calculateFlightFare(Integer flightId)
+    {
+        return  airportRepository.calculateFlightFare(flightId);
+    }
+
+    public int countOfBookingsDoneByPassengerAllCombined(Integer passengerId)
+    {
+        return airportRepository.countOfBookingsDoneByPassengerAllCombined(passengerId);
+    }
+
+    public int calculateRevenueOfAFlight(Integer flightId)
+    {
+        return airportRepository.calculateRevenueOfAFlight(flightId);
     }
 }
