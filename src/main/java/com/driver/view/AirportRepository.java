@@ -28,35 +28,66 @@ public class AirportRepository
     public void addAirport(Airport airport)
     {
         airportDB.put(airport.getAirportName(), airport);
-        airportAndNoOfTerminals.add(new Pair(airport.getAirportName(),airport.getNoOfTerminals()));
+//        airportAndNoOfTerminals.add(new Pair(airport.getAirportName(),airport.getNoOfTerminals()));
     }
 
-    public String addPassenger(Passenger passenger)
+    public String getLargestAirportName()
     {
-        if(passengerDB.containsKey(passenger.getPassengerId()) == false)
-        {
-            passengerDB.put(passenger.getPassengerId(), passenger);
-            return "SUCCESS";
+        String ans = "";
+        int terminals = 0;
+        for(Airport airport : airportDB.values()){
+
+            if(airport.getNoOfTerminals()>terminals){
+                ans = airport.getAirportName();
+                terminals = airport.getNoOfTerminals();
+            }else if(airport.getNoOfTerminals()==terminals){
+                if(airport.getAirportName().compareTo(ans)<0){
+                    ans = airport.getAirportName();
+                }
+            }
         }
-        return "";
+        return ans;
     }
 
-    public String addFlight(Flight flight)
+    public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity, City toCity)
     {
-        flightDB.put(flight.getFlightId(), flight);
-        return "SUCCESS";
+        double currDuration = (double) Integer.MAX_VALUE;
+        for(Integer key : flightDB.keySet())
+        {
+            Flight flight = flightDB.get(key);
+            if(flight.getFromCity().equals(fromCity) && flight.getToCity().equals(toCity))
+            {
+                currDuration = Math.min(currDuration, flight.getDuration());
+            }
+        }
+        if(currDuration == (double) Integer.MAX_VALUE) return -1.0;
+        return currDuration;
     }
 
-    public List<Pair> getAllPairsOfAirportAndNoOfTerminals()
+    public int getNumberOfPeopleOn(Date date, String airportName)
     {
-        return airportAndNoOfTerminals;
+        Airport airport = airportDB.get(airportName);
+        if(Objects.isNull(airport)) return 0;
+
+        City city = airport.getCity();
+        int cnt = 0;
+        for(int key : flightDB.keySet())
+        {
+            Flight flight = flightDB.get(key);
+            if(flight.getFlightDate().equals(date))
+            {
+                if(flight.getFromCity().equals(city) || flight.getToCity().equals(city))
+                {
+                    cnt += flightAndPassengersDB.get(flight.getFlightId()).size();
+                }
+            }
+        }
+        return cnt;
     }
 
-    public String getAirportNameFromFlightId(Integer flightId)
+    public int calculateFlightFare(Integer flightId)
     {
-        if(flightDB.containsKey(flightId))
-            return flightDB.get(flightId).getFromCity().toString();
-        return "";
+        return flightAndPassengersDB.get(flightId).size() * 50 + 3000;
     }
 
     public String bookATicket(Integer flightId, Integer passengerId)
@@ -87,21 +118,6 @@ public class AirportRepository
         return "SUCCESS";
     }
 
-    public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity, City toCity)
-    {
-        double currDuration = (double) Integer.MAX_VALUE;
-        for(Integer key : flightDB.keySet())
-        {
-            Flight flight = flightDB.get(key);
-            if(flight.getFromCity().equals(fromCity) && flight.getToCity().equals(toCity))
-            {
-                currDuration = Math.min(currDuration, flight.getDuration());
-            }
-        }
-        if(currDuration == (double) Integer.MAX_VALUE) return -1.0;
-        return currDuration;
-    }
-
     public String cancelATicket(Integer flightId, Integer passengerId)
     {
         List<Passenger> passengerList = flightAndPassengersDB.get(passengerId);
@@ -118,30 +134,55 @@ public class AirportRepository
         return "FAILURE";
     }
 
-    public int getNumberOfPeopleOn(Date date, String airportName)
+    public String addFlight(Flight flight)
     {
-        Airport airport = airportDB.get(airportName);
-        if(Objects.isNull(airport)) return 0;
+        flightDB.put(flight.getFlightId(), flight);
+        return "SUCCESS";
+    }
 
-        City city = airport.getCity();
-        int cnt = 0;
-        for(int key : flightDB.keySet())
+
+    public String addPassenger(Passenger passenger)
+    {
+        if(passengerDB.containsKey(passenger.getPassengerId()) == false)
         {
-            Flight flight = flightDB.get(key);
-            if(flight.getFlightDate().equals(date))
+            passengerDB.put(passenger.getPassengerId(), passenger);
+            return "SUCCESS";
+        }
+        return "";
+    }
+
+
+    public List<Pair> getAllPairsOfAirportAndNoOfTerminals()
+    {
+        return airportAndNoOfTerminals;
+    }
+
+    public String getAirportNameFromFlightId(Integer flightId)
+    {
+//        if(flightDB.containsKey(flightId))
+//            return flightDB.get(flightId).getFromCity().toString();
+
+        if(flightDB.containsKey(flightId))
+        {
+            City city = flightDB.get(flightId).getFromCity();
+            for(Airport airport:airportDB.values())
             {
-                if(flight.getFromCity().equals(city) || flight.getToCity().equals(city))
+                if(airport.getCity().equals(city))
                 {
-                    cnt += flightAndPassengersDB.get(flight.getFlightId()).size();
+                    return airport.getAirportName();
                 }
             }
         }
-        return cnt;
+        return null;
     }
 
-    public int calculateFlightFare(Integer flightId)
+    public int calculateRevenueOfAFlight(Integer flightId)
     {
-        return flightAndPassengersDB.get(flightId).size() * 50 + 3000;
+        int ticketsBookedTillNow = flightAndPassengersDB.get(flightId).size();
+        int amountWith3000Rs = ticketsBookedTillNow * 3000;
+        int ExtraMoneryEnjoy = (ticketsBookedTillNow * (ticketsBookedTillNow - 1) * 25);
+        int totalKamayaFlightWaloNe = amountWith3000Rs + ExtraMoneryEnjoy;
+        return totalKamayaFlightWaloNe;
     }
 
     public int countOfBookingsDoneByPassengerAllCombined(Integer passengerId)
@@ -158,12 +199,7 @@ public class AirportRepository
         return cnt;
     }
 
-    public int calculateRevenueOfAFlight(Integer flightId)
-    {
-        int ticketsBookedTillNow = flightAndPassengersDB.get(flightId).size();
-        int amountWith3000Rs = ticketsBookedTillNow * 3000;
-        int ExtraMoneryEnjoy = (ticketsBookedTillNow * (ticketsBookedTillNow - 1) * 25);
-        int totalKamayaFlightWaloNe = amountWith3000Rs + ExtraMoneryEnjoy;
-        return totalKamayaFlightWaloNe;
-    }
+
+
+
 }

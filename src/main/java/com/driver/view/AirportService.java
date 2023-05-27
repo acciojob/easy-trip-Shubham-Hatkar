@@ -23,47 +23,28 @@ public class AirportService
         airportRepository.addAirport(airport);
     }
 
-    public String addPassenger(Passenger passenger)
-    {
-        return airportRepository.addPassenger(passenger);
-    }
-
-    public String addFlight(Flight flight)
-    {
-        return airportRepository.addFlight(flight);
-    }
-
     public String getLargestAirportName()
     {
-        List<Pair> list = airportRepository.getAllPairsOfAirportAndNoOfTerminals();
-        Collections.sort(list, (a, b) -> (a.noOfTerminals > b.noOfTerminals) ? 1 : -1);
-        int size = list.size();
-        if(size >= 2 && list.get(size - 1).noOfTerminals == list.get(size - 2).noOfTerminals)
-        {
-            List<String> airportNamesList = new ArrayList<>();
-            int prev = list.get(size - 1).noOfTerminals;
-            int i = size - 1;
-            while(i >= 0 && list.get(i).noOfTerminals == prev)
-            {
-                airportNamesList.add(list.get(i).airportName);
-                i--;
-            }
-            if(airportNamesList.size() == 1) return airportNamesList.get(0);
-
-            Collections.sort(airportNamesList);
-            return airportNamesList.get(0);
-        }
-        return list.get(list.size() - 1).airportName;
-    }
-
-    public String getAirportNameFromFlightId(Integer flightId)
-    {
-        return airportRepository.getAirportNameFromFlightId(flightId);
-    }
-
-    public String bookATicket(Integer flightId, Integer passengerId)
-    {
-        return airportRepository.bookATicket(flightId, passengerId);
+//        List<Pair> list = airportRepository.getAllPairsOfAirportAndNoOfTerminals();
+//        Collections.sort(list, (a, b) -> (a.noOfTerminals > b.noOfTerminals) ? 1 : -1);
+//        int size = list.size();
+//        if(size >= 2 && list.get(size - 1).noOfTerminals == list.get(size - 2).noOfTerminals)
+//        {
+//            List<String> airportNamesList = new ArrayList<>();
+//            int prev = list.get(size - 1).noOfTerminals;
+//            int i = size - 1;
+//            while(i >= 0 && list.get(i).noOfTerminals == prev)
+//            {
+//                airportNamesList.add(list.get(i).airportName);
+//                i--;
+//            }
+//            if(airportNamesList.size() == 1) return airportNamesList.get(0);
+//
+//            Collections.sort(airportNamesList);
+//            return airportNamesList.get(0);
+//        }
+//        return list.get(list.size() - 1).airportName;
+        return airportRepository.getLargestAirportName();
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity, City toCity)
@@ -71,18 +52,45 @@ public class AirportService
         return airportRepository.getShortestDurationOfPossibleBetweenTwoCities(fromCity,toCity);
     }
 
+    public int getNumberOfPeopleOn(Date date, String airportName) {
+        return airportRepository.getNumberOfPeopleOn(date,airportName);
+    }
+
+
+    public int calculateFlightFare(Integer flightId)
+    {
+        return  airportRepository.calculateFlightFare(flightId);
+    }
+
+
+    public String bookATicket(Integer flightId, Integer passengerId)
+    {
+        return airportRepository.bookATicket(flightId, passengerId);
+    }
+
     public String cancelATicket(Integer flightId, Integer passengerId)
     {
         return airportRepository.cancelATicket(flightId,passengerId);
     }
 
-    public int getNumberOfPeopleOn(Date date, String airportName) {
-        return airportRepository.getNumberOfPeopleOn(date,airportName);
+    public String addFlight(Flight flight)
+    {
+        return airportRepository.addFlight(flight);
     }
 
-    public int calculateFlightFare(Integer flightId)
+    public String addPassenger(Passenger passenger)
     {
-        return  airportRepository.calculateFlightFare(flightId);
+        return airportRepository.addPassenger(passenger);
+    }
+
+    public String getAirportNameFromFlightId(Integer flightId)
+    {
+        return airportRepository.getAirportNameFromFlightId(flightId);
+    }
+
+    public int calculateRevenueOfAFlight(Integer flightId)
+    {
+        return airportRepository.calculateRevenueOfAFlight(flightId);
     }
 
     public int countOfBookingsDoneByPassengerAllCombined(Integer passengerId)
@@ -90,8 +98,5 @@ public class AirportService
         return airportRepository.countOfBookingsDoneByPassengerAllCombined(passengerId);
     }
 
-    public int calculateRevenueOfAFlight(Integer flightId)
-    {
-        return airportRepository.calculateRevenueOfAFlight(flightId);
-    }
+
 }
