@@ -5,6 +5,8 @@ import com.driver.model.Airport;
 import com.driver.model.City;
 import com.driver.model.Flight;
 import com.driver.model.Passenger;
+import com.driver.view.AirportService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,22 +18,25 @@ import java.util.Objects;
 
 @RestController
 public class AirportController {
-    @PostMapping("/add_airport")
+
+    @Autowired
+    AirportService airportService;
+
+    @PostMapping("/add_airport") // done
     public String addAirport(@RequestBody Airport airport){
 
         //Simply add airport details to your database
         //Return a String message "SUCCESS"
-
+        airportService.addAirport(airport);
         return "SUCCESS";
     }
 
-    @GetMapping("/get-largest-aiport")
+    @GetMapping("/get-largest-aiport") // done
     public String getLargestAirportName(){
 
         //Largest airport is in terms of terminals. 3 terminal airport is larger than 2 terminal airport
         //Incase of a tie return the Lexicographically smallest airportName
-
-       return null;
+        return airportService.getLargestAirportName();
     }
 
     @GetMapping("/get-shortest-time-travel-between-cities")
@@ -40,7 +45,7 @@ public class AirportController {
         //Find the duration by finding the shortest flight that connects these 2 cities directly
         //If there is no direct flight between 2 cities return -1.
 
-       return 0;
+       return airportService.getShortestDurationOfPossibleBetweenTwoCities(fromCity,toCity);
     }
 
     @GetMapping("/get-number-of-people-on-airport-on/{date}")
@@ -65,7 +70,7 @@ public class AirportController {
     }
 
 
-    @PostMapping("/book-a-ticket")
+    @PostMapping("/book-a-ticket") // done
     public String bookATicket(@RequestParam("flightId")Integer flightId,@RequestParam("passengerId")Integer passengerId){
 
         //If the numberOfPassengers who have booked the flight is greater than : maxCapacity, in that case :
@@ -73,7 +78,7 @@ public class AirportController {
         //Also if the passenger has already booked a flight then also return "FAILURE".
         //else if you are able to book a ticket then return "SUCCESS"
 
-        return null;
+        return airportService.bookATicket(flightId,passengerId);
     }
 
     @PutMapping("/cancel-a-ticket")
@@ -84,7 +89,7 @@ public class AirportController {
         // Otherwise return a "SUCCESS" message
         // and also cancel the ticket that passenger had booked earlier on the given flightId
 
-       return null;
+       return airportService.cancelATicket(flightId,passengerId);
     }
 
 
@@ -95,21 +100,21 @@ public class AirportController {
        return 0;
     }
 
-    @PostMapping("/add-flight")
+    @PostMapping("/add-flight") // done
     public String addFlight(@RequestBody Flight flight){
 
         //Return a "SUCCESS" message string after adding a flight.
+        airportService.addFlight(flight);
        return null;
     }
 
 
-    @GetMapping("/get-aiportName-from-flight-takeoff/{flightId}")
+    @GetMapping("/get-aiportName-from-flight-takeoff/{flightId}") // done
     public String getAirportNameFromFlightId(@PathVariable("flightId")Integer flightId){
 
         //We need to get the starting airportName from where the flight will be taking off (Hint think of City variable if that can be of some use)
         //return null incase the flightId is invalid or you are not able to find the airportName
-
-        return null;
+        return airportService.getAirportNameFromFlightId(flightId);
     }
 
 
@@ -125,13 +130,14 @@ public class AirportController {
     }
 
 
-    @PostMapping("/add-passenger")
+    @PostMapping("/add-passenger") // done
     public String addPassenger(@RequestBody Passenger passenger){
 
         //Add a passenger to the database
         //And return a "SUCCESS" message if the passenger has been added successfully.
 
-       return null;
+        airportService.addPassenger(passenger);
+        return null;
     }
 
 
