@@ -27,7 +27,10 @@ public class AirportRepository
 
     public void addAirport(Airport airport)
     {
-        airportDB.put(airport.getAirportName(), airport);
+        if(airport != null)
+        {
+            airportDB.put(airport.getAirportName(), airport);
+        }
 //        airportAndNoOfTerminals.add(new Pair(airport.getAirportName(),airport.getNoOfTerminals()));
     }
 
